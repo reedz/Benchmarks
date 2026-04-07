@@ -108,10 +108,17 @@ namespace PlatformBenchmarks
                 Console.WriteLine(">>> Using Kestrel.Transport.IoUring <<<");
                 hostBuilder.UseIoUring(options =>
                 {
+                    if (int.TryParse(Environment.GetEnvironmentVariable("IOURING_THREAD_COUNT"), out var tc))
+                        options.ThreadCount = tc;
+                    else
+                        options.ThreadCount = Environment.ProcessorCount;
+
                     if (int.TryParse(Environment.GetEnvironmentVariable("IOURING_RING_SIZE"), out var ringSize))
                         options.RingSize = ringSize;
                     if (int.TryParse(Environment.GetEnvironmentVariable("IOURING_MAX_CONNECTIONS"), out var maxConn))
                         options.MaxConnections = maxConn;
+
+                    Console.WriteLine($"    ThreadCount={options.ThreadCount}, RingSize={options.RingSize}, MaxConnections={options.MaxConnections}");
                 });
             }
             else
