@@ -118,7 +118,10 @@ namespace PlatformBenchmarks
                     if (int.TryParse(Environment.GetEnvironmentVariable("IOURING_MAX_CONNECTIONS"), out var maxConn))
                         options.MaxConnections = maxConn;
 
-                    Console.WriteLine($"    ThreadCount={options.ThreadCount}, RingSize={options.RingSize}, MaxConnections={options.MaxConnections}");
+                    options.EnableBufferRing = Environment.GetEnvironmentVariable("IOURING_BUFRING") != "0";
+                    options.EnableSqPoll = Environment.GetEnvironmentVariable("IOURING_SQPOLL") == "1";
+
+                    Console.WriteLine($"    ThreadCount={options.ThreadCount}, RingSize={options.RingSize}, MaxConnections={options.MaxConnections}, BufRing={options.EnableBufferRing}");
                 });
             }
             else
