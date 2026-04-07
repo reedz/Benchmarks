@@ -18,7 +18,7 @@
   </PropertyGroup>
 
   <ItemGroup Condition="'$(UseIoUringTransport)' == 'true'">
-    <PackageReference Include="Kestrel.Transport.IoUring" Version="*" />
+    <PackageReference Include="Kestrel.Transport.IoUring" Version="1.1.0" />
   </ItemGroup>
 
   <ItemGroup>
