@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFrameworks>net8.0;net9.0</TargetFrameworks>
+    <TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
     <OutputType>Exe</OutputType>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <IsTestAssetProject>true</IsTestAssetProject>
@@ -12,6 +12,14 @@
   <PropertyGroup>
     <DefineConstants Condition=" '$(IsDatabase)' == 'true' ">$(DefineConstants);DATABASE</DefineConstants>
   </PropertyGroup>
+
+  <PropertyGroup Condition="'$(UseIoUringTransport)' == 'true'">
+    <DefineConstants>$(DefineConstants);IOURING</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(UseIoUringTransport)' == 'true'">
+    <PackageReference Include="Kestrel.Transport.IoUring" Version="*" />
+  </ItemGroup>
 
   <ItemGroup>
     <None Include="appsettings.json" CopyToOutputDirectory="PreserveNewest" />

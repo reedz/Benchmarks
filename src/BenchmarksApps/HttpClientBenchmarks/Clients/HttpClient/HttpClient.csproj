@@ -7,6 +7,14 @@
     <ServerGarbageCollection>true</ServerGarbageCollection>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(UseIoUringTransport)' == 'true'">
+    <DefineConstants>$(DefineConstants);IOURING</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(UseIoUringTransport)' == 'true'">
+    <PackageReference Include="HttpClient.IoUring" Version="*" />
+  </ItemGroup>
+
   <ItemGroup>
     <RuntimeHostConfigurationOption Include="System.Net.SocketsHttpHandler.Http3Support" Value="true" />
   </ItemGroup>

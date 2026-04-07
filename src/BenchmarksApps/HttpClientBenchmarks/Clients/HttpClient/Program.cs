@@ -10,6 +10,9 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Crank.EventSources;
+#if IOURING
+using HttpClient.IoUring.Extensions;
+#endif
 
 namespace HttpClientBenchmarks
 {
@@ -135,6 +138,14 @@ namespace HttpClientBenchmarks
                         ConnectTimeout = Timeout.InfiniteTimeSpan,
                     };
                 }
+
+#if IOURING
+                if (handler is SocketsHttpHandler shh && Environment.GetEnvironmentVariable("USE_IOURING_TRANSPORT") != "0")
+                {
+                    Log(">>> Using HttpClient.IoUring <<<");
+                    shh.UseIoUring();
+                }
+#endif
 
                 if (s_options.UseHttpMessageInvoker)
                 {

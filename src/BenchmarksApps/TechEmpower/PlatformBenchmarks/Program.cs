@@ -10,6 +10,9 @@ using Microsoft.Extensions.Configuration;
 #if DATABASE
 using Npgsql;
 #endif
+#if IOURING
+using Kestrel.Transport.IoUring;
+#endif
 
 namespace PlatformBenchmarks
 {
@@ -99,15 +102,31 @@ namespace PlatformBenchmarks
                 })
                 .UseStartup<Startup>();
 
-            hostBuilder.UseSockets(options =>
+#if IOURING
+            if (Environment.GetEnvironmentVariable("USE_IOURING_TRANSPORT") != "0")
             {
-                options.WaitForDataBeforeAllocatingBuffer = false;
-
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                Console.WriteLine(">>> Using Kestrel.Transport.IoUring <<<");
+                hostBuilder.UseIoUring(options =>
                 {
-                    options.UnsafePreferInlineScheduling = Environment.GetEnvironmentVariable("DOTNET_SYSTEM_NET_SOCKETS_INLINE_COMPLETIONS") == "1";
-                }
-            });
+                    if (int.TryParse(Environment.GetEnvironmentVariable("IOURING_RING_SIZE"), out var ringSize))
+                        options.RingSize = ringSize;
+                    if (int.TryParse(Environment.GetEnvironmentVariable("IOURING_MAX_CONNECTIONS"), out var maxConn))
+                        options.MaxConnections = maxConn;
+                });
+            }
+            else
+#endif
+            {
+                hostBuilder.UseSockets(options =>
+                {
+                    options.WaitForDataBeforeAllocatingBuffer = false;
+
+                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                    {
+                        options.UnsafePreferInlineScheduling = Environment.GetEnvironmentVariable("DOTNET_SYSTEM_NET_SOCKETS_INLINE_COMPLETIONS") == "1";
+                    }
+                });
+            }
 
             var host = hostBuilder.Build();
 

@@ -15,6 +15,10 @@ using Microsoft.Crank.EventSources;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+#if IOURING
+using Kestrel.Transport.IoUring;
+using HttpClient.IoUring.Extensions;
+#endif
 
 namespace Proxy
 {
@@ -73,6 +77,14 @@ namespace Proxy
                 .UseConfiguration(config)
                 ;
 
+#if IOURING
+            if (Environment.GetEnvironmentVariable("USE_IOURING_TRANSPORT") != "0")
+            {
+                Console.WriteLine(">>> Using Kestrel.Transport.IoUring for inbound <<<");
+                builder.UseIoUring();
+            }
+#endif
+
             InitializeHttpClient();
 
             builder = builder.Configure(app => app.Run(ProxyRequest));
@@ -95,6 +107,14 @@ namespace Proxy
 
             // Accept any SSL certificate
             httpHandler.SslOptions.RemoteCertificateValidationCallback += (object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors) => true;
+
+#if IOURING
+            if (Environment.GetEnvironmentVariable("USE_IOURING_TRANSPORT") != "0")
+            {
+                Console.WriteLine(">>> Using HttpClient.IoUring for outbound <<<");
+                httpHandler.UseIoUring();
+            }
+#endif
 
             _httpMessageInvoker = new HttpMessageInvoker(httpHandler);
         }
