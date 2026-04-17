@@ -12,6 +12,7 @@ using Npgsql;
 #endif
 #if IOURING
 using Kestrel.Transport.IoUring;
+using Microsoft.Extensions.Logging;
 #endif
 
 namespace PlatformBenchmarks
