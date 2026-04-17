@@ -103,6 +103,19 @@ namespace PlatformBenchmarks
                 .UseStartup<Startup>();
 
 #if IOURING
+            // DEBUG: surface transport logger warnings/errors via Console when diagnosing io_uring regressions.
+            if (Environment.GetEnvironmentVariable("IOURING_DEBUG_LOGS") == "1")
+            {
+                hostBuilder.ConfigureLogging(b =>
+                {
+                    b.ClearProviders();
+                    b.AddConsole();
+                    b.SetMinimumLevel(Microsoft.Extensions.Logging.LogLevel.Debug);
+                });
+            }
+#endif
+
+#if IOURING
             if (Environment.GetEnvironmentVariable("USE_IOURING_TRANSPORT") != "0")
             {
                 Console.WriteLine(">>> Using Kestrel.Transport.IoUring <<<");
