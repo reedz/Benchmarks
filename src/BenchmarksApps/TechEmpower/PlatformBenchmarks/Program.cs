@@ -134,8 +134,12 @@ namespace PlatformBenchmarks
 
                     options.EnableBufferRing = Environment.GetEnvironmentVariable("IOURING_BUFRING") != "0";
                     options.EnableSqPoll = Environment.GetEnvironmentVariable("IOURING_SQPOLL") == "1";
+                    options.EnableCoopTaskRun = Environment.GetEnvironmentVariable("IOURING_COOP") == "1";
+                    options.EnableSingleIssuer = Environment.GetEnvironmentVariable("IOURING_SINGLE_ISSUER") == "1";
+                    options.EnableDeferTaskRun = Environment.GetEnvironmentVariable("IOURING_DEFER_TASKRUN") == "1";
 
                     Console.WriteLine($"    ThreadCount={options.ThreadCount}, RingSize={options.RingSize}, MaxConnections={options.MaxConnections}, BufRing={options.EnableBufferRing}");
+                    Console.WriteLine($"    CoopTaskRun={options.EnableCoopTaskRun}, SingleIssuer={options.EnableSingleIssuer}, DeferTaskRun={options.EnableDeferTaskRun}, SqPoll={options.EnableSqPoll}");
                 });
             }
             else
