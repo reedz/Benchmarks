@@ -134,8 +134,6 @@ namespace PlatformBenchmarks
 
                     options.EnableBufferRing = Environment.GetEnvironmentVariable("IOURING_BUFRING") != "0";
                     options.EnableSqPoll = Environment.GetEnvironmentVariable("IOURING_SQPOLL") == "1";
-                    if (int.TryParse(Environment.GetEnvironmentVariable("IOURING_LOG_POOL_STATS_INTERVAL"), out var statsInt))
-                        options.LogPoolStatsInterval = statsInt;
                     // Note: EnableCoopTaskRun/EnableSingleIssuer/EnableDeferTaskRun were added post-v2.1.0.
                     // Round-2 local benchmarks showed all three are neutral or worse for our self-completing
                     // pattern, so we keep them off here. Re-enable via reflection if you publish a newer pkg.
