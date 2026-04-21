@@ -134,12 +134,11 @@ namespace PlatformBenchmarks
 
                     options.EnableBufferRing = Environment.GetEnvironmentVariable("IOURING_BUFRING") != "0";
                     options.EnableSqPoll = Environment.GetEnvironmentVariable("IOURING_SQPOLL") == "1";
-                    options.EnableCoopTaskRun = Environment.GetEnvironmentVariable("IOURING_COOP") == "1";
-                    options.EnableSingleIssuer = Environment.GetEnvironmentVariable("IOURING_SINGLE_ISSUER") == "1";
-                    options.EnableDeferTaskRun = Environment.GetEnvironmentVariable("IOURING_DEFER_TASKRUN") == "1";
+                    // Note: EnableCoopTaskRun/EnableSingleIssuer/EnableDeferTaskRun were added post-v2.1.0.
+                    // Round-2 local benchmarks showed all three are neutral or worse for our self-completing
+                    // pattern, so we keep them off here. Re-enable via reflection if you publish a newer pkg.
 
-                    Console.WriteLine($"    ThreadCount={options.ThreadCount}, RingSize={options.RingSize}, MaxConnections={options.MaxConnections}, BufRing={options.EnableBufferRing}");
-                    Console.WriteLine($"    CoopTaskRun={options.EnableCoopTaskRun}, SingleIssuer={options.EnableSingleIssuer}, DeferTaskRun={options.EnableDeferTaskRun}, SqPoll={options.EnableSqPoll}");
+                    Console.WriteLine($"    ThreadCount={options.ThreadCount}, RingSize={options.RingSize}, MaxConnections={options.MaxConnections}, BufRing={options.EnableBufferRing}, SqPoll={options.EnableSqPoll}");
                 });
             }
             else
