@@ -9,6 +9,9 @@ using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Server.HttpSys;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.AspNetCore.Server.Kestrel.Https;
+#if IOURING
+using Kestrel.Transport.IoUring;
+#endif
 
 Console.WriteLine("Starting application...");
 
@@ -78,7 +81,6 @@ builder.WebHost.UseKestrel(options =>
     {
         ConfigureListen(options, builder.Configuration, value);
     }
-
     void ConfigureListen(KestrelServerOptions serverOptions, IConfigurationRoot config, string url)
     {
         var urlPrefix = UrlPrefix.Create(url);
@@ -141,6 +143,30 @@ builder.WebHost.UseKestrel(options =>
         });
     }
 });
+
+#if IOURING
+if (Environment.GetEnvironmentVariable("USE_IOURING_TRANSPORT") != "0")
+{
+    Console.WriteLine(">>> Using Kestrel.Transport.IoUring (TLS Kestrel app) <<<");
+    builder.WebHost.UseIoUring(options =>
+    {
+        if (int.TryParse(Environment.GetEnvironmentVariable("IOURING_THREAD_COUNT"), out var tc))
+            options.ThreadCount = tc;
+        else
+            options.ThreadCount = Environment.ProcessorCount;
+
+        if (int.TryParse(Environment.GetEnvironmentVariable("IOURING_RING_SIZE"), out var ringSize))
+            options.RingSize = ringSize;
+        if (int.TryParse(Environment.GetEnvironmentVariable("IOURING_MAX_CONNECTIONS"), out var maxConn))
+            options.MaxConnections = maxConn;
+
+        options.EnableBufferRing = Environment.GetEnvironmentVariable("IOURING_BUFRING") != "0";
+        options.EnableSqPoll = Environment.GetEnvironmentVariable("IOURING_SQPOLL") == "1";
+
+        Console.WriteLine($"    ThreadCount={options.ThreadCount}, RingSize={options.RingSize}, MaxConnections={options.MaxConnections}, BufRing={options.EnableBufferRing}, SqPoll={options.EnableSqPoll}");
+    });
+}
+#endif
 
 var app = builder.Build();
 
